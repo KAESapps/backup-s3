@@ -38,18 +38,20 @@ const uploadChangedFiles = seq([
   ),
   ({ modifiedFiles, bucket }) =>
     console.log(`uploading ${modifiedFiles.length} to ${bucket}`),
-  ({ modifiedFiles, bucket }) =>
-    pMap(
+  ({ modifiedFiles, bucket }) => {
+    let count = modifiedFiles.length;
+    return pMap(
       modifiedFiles,
       (key, i) => {
         return s3Upload({
           bucket,
           key,
           content: fs.createReadStream(key)
-        }).then(() => console.log(`${i}/${modifiedFiles.length}`));
+        }).then(() => console.log(`restant ${count--}`));
       },
       { concurrency: 100 }
-    ),
+    );
+  },
   exec(
     ({ currentBackupPath, lastBackupPath }) =>
       `mv ${currentBackupPath} ${lastBackupPath}`
