@@ -1,0 +1,23 @@
+{
+  "name": "backup-s3",
+  "version": "1.0.0",
+  "description": "copy changed files to s3",
+  "main": "index.js",
+  "bin": {
+    "backup-s3": "./cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "2.294.0",
+    "delay": "3.0.0",
+    "execa": "0.10.0",
+    "minimist": "1.2.0",
+    "p-forever": "1.0.1",
+    "p-map": "1.2.0",
+    "p-pipe": "1.2.0"
+  }
+}
