@@ -41,10 +41,14 @@ const uploadChangedFiles = seq([
   ({ modifiedFiles, bucket }) =>
     pMap(
       modifiedFiles,
-      key => {
-        return s3Upload({ bucket, key, content: fs.createReadStream(key) });
+      (key, i) => {
+        return s3Upload({
+          bucket,
+          key,
+          content: fs.createReadStream(key)
+        }).then(() => console.log(`${i}/${modifiedFiles.length}`));
       },
-      { concurrency: 10 }
+      { concurrency: 100 }
     ),
   exec(
     ({ currentBackupPath, lastBackupPath }) =>
