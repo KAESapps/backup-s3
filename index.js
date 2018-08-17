@@ -4,12 +4,10 @@ const path = require("path");
 const fileExists = require("./lib/fileExists");
 const pMap = require("p-map");
 const s3Upload = require("./lib/s3Upload");
-const fs = require("fs");
 const pForever = require("p-forever");
 const delay = require("delay");
 
 const uploadChangedFiles = seq([
-  //   ctxAssign("fullPath", ctx => path.resolve(process.cwd(), ctx.source)),
   ctxAssign("fullPath", ctx => ctx.source),
   //   ensure(pipe([ctx => fs.statSync(ctx.fullPath), stat => stat.isDirectory()])),
   ctxAssign("parentDir", ({ fullPath }) => path.dirname(fullPath)),
@@ -46,14 +44,17 @@ const uploadChangedFiles = seq([
     let count = modifiedFiles.length;
     return pMap(
       modifiedFiles,
-      (key, i) => {
-        return s3Upload({
+      key =>
+        // readFile(key)
+        //   .then(content =>
+        s3Upload({
           bucket,
-          key,
-          content: fs.createReadStream(key)
-        }).then(() => console.log(`restant ${count--}`));
-      },
-      { concurrency: concurrency || 10 }
+          key
+          // content: fs.createReadStream(key)
+        })
+          // )
+          .then(() => console.log(`restant ${--count}`)),
+      { concurrency: concurrency || 1 }
     );
   },
   exec(({ currentBackupPath, lastBackupPath }) => [
