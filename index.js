@@ -20,16 +20,20 @@ const uploadChangedFiles = seq([
   ctxAssign("lastBackupPath", ({ parentDir, dirName }) =>
     path.join(parentDir, `last-backup-${dirName}`)
   ),
-  exec(({ currentBackupPath }) => `touch ${currentBackupPath}`),
+  exec(({ currentBackupPath }) => ["touch", currentBackupPath]),
   ctxAssign(
     "modifiedFiles",
     ite(
       ctx => fileExists(ctx.lastBackupPath),
-      exec(
-        ({ fullPath, lastBackupPath }) =>
-          `find ${fullPath} -type f -newer ${lastBackupPath}`
-      ),
-      exec(({ fullPath }) => `find ${fullPath} -type f`)
+      exec(({ fullPath, lastBackupPath }) => [
+        "find",
+        fullPath,
+        "-type",
+        "f",
+        "-newer",
+        lastBackupPath
+      ]),
+      exec(({ fullPath }) => ["find", fullPath, "-type", "f"])
     )
   ),
   ctxAssign(
@@ -37,8 +41,8 @@ const uploadChangedFiles = seq([
     ({ modifiedFiles }) => (modifiedFiles ? modifiedFiles.split("\n") : [])
   ),
   ({ modifiedFiles, bucket }) =>
-    console.log(`uploading ${modifiedFiles.length} to ${bucket}`),
-  ({ modifiedFiles, bucket }) => {
+    console.log(`uploading ${modifiedFiles.length} files to ${bucket}`),
+  ({ modifiedFiles, bucket, concurrency }) => {
     let count = modifiedFiles.length;
     return pMap(
       modifiedFiles,
@@ -49,13 +53,14 @@ const uploadChangedFiles = seq([
           content: fs.createReadStream(key)
         }).then(() => console.log(`restant ${count--}`));
       },
-      { concurrency: 100 }
+      { concurrency: concurrency || 10 }
     );
   },
-  exec(
-    ({ currentBackupPath, lastBackupPath }) =>
-      `mv ${currentBackupPath} ${lastBackupPath}`
-  )
+  exec(({ currentBackupPath, lastBackupPath }) => [
+    "mv",
+    currentBackupPath,
+    lastBackupPath
+  ])
 ]);
 
 const defaultDelay = 1000 * 60 * 5;
