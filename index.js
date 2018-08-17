@@ -6,18 +6,9 @@ const pMap = require("p-map");
 const s3Upload = require("./lib/s3Upload");
 const pForever = require("p-forever");
 const delay = require("delay");
+const defaultDelay = 1000 * 60 * 5;
 
 const uploadChangedFiles = seq([
-  ctxAssign("fullPath", ctx => ctx.source),
-  //   ensure(pipe([ctx => fs.statSync(ctx.fullPath), stat => stat.isDirectory()])),
-  ctxAssign("parentDir", ({ fullPath }) => path.dirname(fullPath)),
-  ctxAssign("dirName", ({ fullPath }) => path.basename(fullPath)),
-  ctxAssign("currentBackupPath", ({ parentDir, dirName }) =>
-    path.join(parentDir, `current-backup-${dirName}`)
-  ),
-  ctxAssign("lastBackupPath", ({ parentDir, dirName }) =>
-    path.join(parentDir, `last-backup-${dirName}`)
-  ),
   exec(({ currentBackupPath }) => ["touch", currentBackupPath]),
   ctxAssign(
     "modifiedFiles",
@@ -25,36 +16,33 @@ const uploadChangedFiles = seq([
       ctx => fileExists(ctx.lastBackupPath),
       exec(({ fullPath, lastBackupPath }) => [
         "find",
-        fullPath,
+        ".",
         "-type",
         "f",
         "-newer",
         lastBackupPath
       ]),
-      exec(({ fullPath }) => ["find", fullPath, "-type", "f"])
+      exec(({ fullPath }) => ["find", ".", "-type", "f"])
     )
   ),
   ctxAssign(
     "modifiedFiles",
-    ({ modifiedFiles }) => (modifiedFiles ? modifiedFiles.split("\n") : [])
+    ({ modifiedFiles }) =>
+      modifiedFiles ? modifiedFiles.split("\n").map(path => path.slice(2)) : []
   ),
+  // ({ modifiedFiles, bucket }) => console.log(modifiedFiles),
   ({ modifiedFiles, bucket }) =>
     console.log(`uploading ${modifiedFiles.length} files to ${bucket}`),
-  ({ modifiedFiles, bucket, concurrency }) => {
+  ({ modifiedFiles, bucket }) => {
     let count = modifiedFiles.length;
     return pMap(
       modifiedFiles,
       key =>
-        // readFile(key)
-        //   .then(content =>
         s3Upload({
           bucket,
           key
-          // content: fs.createReadStream(key)
-        })
-          // )
-          .then(() => console.log(`restant ${--count}`)),
-      { concurrency: concurrency || 1 }
+        }).then(() => console.log(`restant ${--count}`)),
+      { concurrency: 1 }
     );
   },
   exec(({ currentBackupPath, lastBackupPath }) => [
@@ -64,12 +52,11 @@ const uploadChangedFiles = seq([
   ])
 ]);
 
-const defaultDelay = 1000 * 60 * 5;
-module.exports = ctx =>
+const uploadChangedFilesForever = ctx =>
   pForever(() => {
     console.log(
       "start uploading changed files in ",
-      ctx.source,
+      ctx.fullPath,
       "to",
       ctx.bucket
     );
@@ -80,3 +67,17 @@ module.exports = ctx =>
       return delay(delayInMs);
     });
   });
+
+module.exports = seq([
+  ctxAssign("fullPath", process.cwd()),
+  //   ensure(pipe([ctx => fs.statSync(ctx.fullPath), stat => stat.isDirectory()])),
+  ctxAssign("parentDir", ({ fullPath }) => path.dirname(fullPath)),
+  ctxAssign("dirName", ({ fullPath }) => path.basename(fullPath)),
+  ctxAssign("currentBackupPath", ({ parentDir, dirName }) =>
+    path.join(parentDir, `current-backup-${dirName}`)
+  ),
+  ctxAssign("lastBackupPath", ({ parentDir, dirName }) =>
+    path.join(parentDir, `last-backup-${dirName}`)
+  ),
+  uploadChangedFilesForever
+]);
