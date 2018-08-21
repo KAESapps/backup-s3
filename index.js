@@ -14,15 +14,14 @@ const uploadChangedFiles = seq([
     "modifiedFiles",
     ite(
       ctx => fileExists(ctx.lastBackupPath),
-      exec(({ fullPath, lastBackupPath }) => [
+      exec(({ lastBackupPath }) => [
         "find",
-        ".",
         "-type",
         "f",
-        "-newer",
+        "-cnewer",
         lastBackupPath
       ]),
-      exec(({ fullPath }) => ["find", ".", "-type", "f"])
+      exec(() => ["find", "-type", "f"])
     )
   ),
   ctxAssign(
