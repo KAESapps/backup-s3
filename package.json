@@ -1,6 +1,6 @@
 {
   "name": "backup-s3",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "copy changed files to s3",
   "main": "index.js",
   "bin": {

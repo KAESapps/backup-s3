@@ -8,4 +8,6 @@ Node doit être installé
 `npm install -g kaesapps/backup-s3`
 Les crédentials pour S3 doivent être dans le dossier ~/.aws ou en variables d'environnement comme expliqué dans la doc du sdk aws
 Se placer dans le répertoire à sauvegarder et lancer la commande
-`backup-s3 --bucket=bucketName --delayEnMin=5`
+`backup-s3 --bucket=bucketName`
+ou en mode continu
+`backup-s3 --bucket=bucketName --continuous --delayEnMin=5`

@@ -24,10 +24,8 @@ const uploadChangedFiles = seq([
       exec(() => ["find", "-type", "f"])
     )
   ),
-  ctxAssign(
-    "modifiedFiles",
-    ({ modifiedFiles }) =>
-      modifiedFiles ? modifiedFiles.split("\n").map(path => path.slice(2)) : []
+  ctxAssign("modifiedFiles", ({ modifiedFiles }) =>
+    modifiedFiles ? modifiedFiles.split("\n").map(path => path.slice(2)) : []
   ),
   // ({ modifiedFiles, bucket }) => console.log(modifiedFiles),
   ({ modifiedFiles, bucket }) =>
@@ -48,7 +46,8 @@ const uploadChangedFiles = seq([
     "mv",
     currentBackupPath,
     lastBackupPath
-  ])
+  ]),
+  () => console.log(`done uploading files`)
 ]);
 
 const uploadChangedFilesForever = ctx =>
@@ -60,14 +59,13 @@ const uploadChangedFilesForever = ctx =>
       ctx.bucket
     );
     return uploadChangedFiles(ctx).then(() => {
-      console.log(`done uploading files`);
       const delayInMs = ctx.delay || defaultDelay;
       console.log(`will try again in ${delayInMs} ms`);
       return delay(delayInMs);
     });
   });
 
-module.exports = seq([
+const init = seq([
   ctxAssign("fullPath", process.cwd()),
   //   ensure(pipe([ctx => fs.statSync(ctx.fullPath), stat => stat.isDirectory()])),
   ctxAssign("parentDir", ({ fullPath }) => path.dirname(fullPath)),
@@ -77,6 +75,8 @@ module.exports = seq([
   ),
   ctxAssign("lastBackupPath", ({ parentDir, dirName }) =>
     path.join(parentDir, `last-backup-${dirName}`)
-  ),
-  uploadChangedFilesForever
+  )
 ]);
+
+exports.once = seq([init, uploadChangedFiles]);
+exports.continuous = seq([init, uploadChangedFilesForever]);
