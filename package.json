@@ -13,22 +13,21 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "2.516.0",
-    "delay": "3.0.0",
-    "execa": "0.10.0",
-    "klogs": "github:kaesapps/klogs#1.0.0",
+    "execa": "2.0.4",
+    "klogs": "kaesapps/klogs#b29e994",
     "minimist": "1.2.0",
-    "p-forever": "1.0.1",
-    "p-map": "1.2.0",
-    "p-pipe": "1.2.0",
-    "p-retry": "2.0.0"
+    "p-forever": "2.1.0",
+    "p-map": "3.0.0",
+    "p-pipe": "3.0.0",
+    "p-retry": "4.1.0"
   },
   "devDependencies": {
-    "eslint": "^5.3.0",
-    "eslint-config-prettier": "^3.0.1",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^3.1.0"
+    "eslint": "^6.2.1",
+    "eslint-config-prettier": "^6.1.0",
+    "eslint-config-standard": "^14.0.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }

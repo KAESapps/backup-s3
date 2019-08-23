@@ -6,7 +6,6 @@ const log = require("./log");
 const pMap = require("p-map");
 const s3Upload = require("./lib/s3Upload");
 const pForever = require("p-forever");
-const delay = require("delay");
 const defaultDelay = 1000 * 60 * 5;
 
 const uploadChangedFiles = seq([
@@ -56,7 +55,7 @@ const uploadChangedFilesForever = ctx =>
     return uploadChangedFiles(ctx).then(() => {
       const delayInMs = ctx.delay || defaultDelay;
       log("retry scheduled", { delayInMs });
-      return delay(delayInMs);
+      return new Promise(resolve => setTimeout(resolve, delayInMs));
     });
   });
 
