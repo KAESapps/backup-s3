@@ -1,6 +1,6 @@
 {
   "name": "backup-s3",
-  "version": "10.1.1",
+  "version": "10.1.2",
   "description": "copy changed files to s3",
   "main": "index.js",
   "bin": {
@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "2.516.0",
+    "aws-sdk": "2.522.0",
     "execa": "2.0.4",
     "klogs": "kaesapps/klogs#b29e994",
     "minimist": "1.2.0",
