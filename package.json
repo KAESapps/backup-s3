@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "2.522.0",
+    "aws-sdk": "2.814.0",
     "execa": "2.0.4",
     "klogs": "kaesapps/klogs#b29e994",
     "minimist": "1.2.0",
