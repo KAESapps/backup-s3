@@ -15,7 +15,7 @@
     "aws-sdk": "2.522.0",
     "execa": "2.0.4",
     "klogs": "kaesapps/klogs#b29e994",
-    "minimist": "1.2.0",
+    "minimist": "1.2.6",
     "p-forever": "2.1.0",
     "p-map": "3.0.0",
     "p-pipe": "3.0.0",
